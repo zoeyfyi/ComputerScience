@@ -1,3 +1,8 @@
+# Haskall generated files
+Functional Programming/*.hi
+Functional Programming/*.hs
+Functional Programming/*.o
+
 *~
 
 # Byte-compiled / optimized / DLL files
