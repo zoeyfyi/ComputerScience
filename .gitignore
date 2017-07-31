@@ -3,6 +3,9 @@ Year 1/Functional Programming/*.hi
 Year 1/Functional Programming/*.hs
 Year 1/Functional Programming/*.o
 
+# transition generated images
+Year 1/Computation and Logic/state.png
+
 *~
 
 # Byte-compiled / optimized / DLL files
