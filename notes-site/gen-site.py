@@ -3,6 +3,7 @@ from urllib.request import unquote
 
 content_path = "content/"
 notes_path = "../Notes/"
+ignore_dirs = ["__pycache__", "res", "exams"]
 
 try:
     shutil.rmtree(os.path.join(content_path, 'Year 1'))
@@ -60,17 +61,21 @@ def process(path):
                     shutil.copyfile(file_path, new_file_path)
 
             elif os.path.isdir(file_path):
+                # Process subdirectorys
+                process(file_path)
+
+                # Ignore special directorys
+                if f in ignore_dirs: return
+                
                 # Create folder
                 os.makedirs(new_file_path)
-                
+
                 # Create _index.md file
                 with open(os.path.join(new_file_path, "_index.md"), "w+") as index_file:
                     index_file.write("---\n")
                     index_file.write("title: \"" + f + "\"\n")
                     index_file.write("---\n")
 
-                # Process subdirectorys
-                process(file_path)
         except Exception as e:
             print(e)
 
