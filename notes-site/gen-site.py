@@ -29,7 +29,7 @@ def process(path):
                         md_file.seek(0, 0)
                         md_file.truncate()
                         md_file.write("---\n")
-                        md_file.write("title: \"" + f + "\"\n")
+                        md_file.write("title: \"" + f[:-len(".ipynb")] + "\"\n")
                         md_file.write("---\n")
                         md_file.write(content)
 
