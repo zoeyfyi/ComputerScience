@@ -1,4 +1,5 @@
 import os, shutil
+from urllib.request import unquote
 
 content_path = "content/"
 notes_path = "../Notes/"
@@ -21,17 +22,39 @@ def process(path):
                     command = "jupyter nbconvert --to markdown --execute --output-dir '" + new_file_root + "' '" + file_path + "'"
                     os.system(command)
                     
-                    # Append title to page
                     md_path = new_file_path[:-len('.ipynb')] + ".md"
                     with open(md_path, 'r+') as md_file:
+                        # Append title to page
                         content = md_file.read()
-
                         md_file.seek(0, 0)
+                        md_file.truncate()
                         md_file.write("---\n")
                         md_file.write("title: \"" + f + "\"\n")
                         md_file.write("---\n")
                         md_file.write(content)
 
+                    with open(md_path, 'r+') as md_file:
+                        # Embed svg's
+                        content = md_file.read()
+                        # print(content)
+                        while True:
+                            index = content.find("![svg](")
+                            if index == -1: break
+                            print("\n\n\n\nCUTTING SVG\n\n\n\n")
+                            end = index
+                            while content[end] != ")": end += 1
+                            
+                            # Extract and transform svg path
+                            svg_path = content[index + len("![svg](") : end]
+                            svg_path = unquote(svg_path)
+                            svg_path = os.path.join(new_file_root, svg_path)
+                            
+                            # Replace svg path in file
+                            content = content[:index] + "{{< svg \"" + svg_path + "\" >}}" + content[end+1:]
+                        
+                        md_file.seek(0, 0)
+                        md_file.truncate()
+                        md_file.write(content)
                 else:
                     # Copy resource file
                     shutil.copyfile(file_path, new_file_path)
