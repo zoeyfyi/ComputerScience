@@ -2,7 +2,7 @@ import os, shutil
 from urllib.request import unquote
 
 content_path = "content/"
-notes_path = "../Notes/"
+notes_path = "../notes/"
 ignore_dirs = ["__pycache__", "res", "exams", ".ipynb_checkpoints"]
 
 try:
