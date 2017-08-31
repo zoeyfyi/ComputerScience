@@ -3,7 +3,7 @@ from urllib.request import unquote
 
 content_path = "content/"
 notes_path = "../Notes/"
-ignore_dirs = ["__pycache__", "res", "exams"]
+ignore_dirs = ["__pycache__", "res", "exams", ".ipynb_checkpoints"]
 
 try:
     shutil.rmtree(os.path.join(content_path, 'Year 1'))
@@ -34,16 +34,18 @@ def process(path):
                         md_file.write("---\n")
                         md_file.write(content)
 
-                    with open(md_path, 'r+') as md_file:
-                        # Embed svg's
-                        content = md_file.read()
-                        # print(content)
-                        while True:
-                            index = content.find("![svg](")
-                            if index == -1: break
-                            print("\n\n\n\nCUTTING SVG\n\n\n\n")
+                    # Embed svg's
+                    while True:
+                        index = content.find("![svg](")
+                        if index == -1: break
+                        with open(md_path, 'r+') as md_file:
+                            content = md_file.read()
+                            md_file.seek(0, 0)
+                            
+                            # Find end of svg url
                             end = index
-                            while content[end] != ")": end += 1
+                            while content[end] != ")": 
+                                end += 1
                             
                             # Extract and transform svg path
                             svg_path = content[index + len("![svg](") : end]
@@ -53,28 +55,29 @@ def process(path):
                             # Replace svg path in file
                             content = content[:index] + "{{< svg \"" + svg_path + "\" >}}" + content[end+1:]
                         
-                        md_file.seek(0, 0)
-                        md_file.truncate()
-                        md_file.write(content)
+                            md_file.truncate()
+                            md_file.write(content)
+
+                    # Change file to mmark
+                    shutil.move(md_path, md_path[:-len('md')]+"mmark")
                 else:
                     # Copy resource file
                     shutil.copyfile(file_path, new_file_path)
 
             elif os.path.isdir(file_path):
-                # Process subdirectorys
-                process(file_path)
-
                 # Ignore special directorys
-                if f in ignore_dirs: return
-                
-                # Create folder
-                os.makedirs(new_file_path)
+                if f not in ignore_dirs:
+                    # Create folder
+                    os.makedirs(new_file_path)
 
-                # Create _index.md file
-                with open(os.path.join(new_file_path, "_index.md"), "w+") as index_file:
-                    index_file.write("---\n")
-                    index_file.write("title: \"" + f + "\"\n")
-                    index_file.write("---\n")
+                    # Create _index.md file
+                    with open(os.path.join(new_file_path, "_index.md"), "w+") as index_file:
+                        index_file.write("---\n")
+                        index_file.write("title: \"" + f + "\"\n")
+                        index_file.write("---\n")
+
+                    # Process subdirectorys
+                    process(file_path)
 
         except Exception as e:
             print(e)

@@ -5,3 +5,6 @@ theme = "docdock"
 
 [params]
 themeVariant = "gray"
+
+[outputs]
+home = [ "HTML", "RSS", "JSON"]
